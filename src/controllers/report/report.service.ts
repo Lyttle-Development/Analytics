@@ -1,26 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { CreateReportDto } from './dto/create-report.dto';
-import { UpdateReportDto } from './dto/update-report.dto';
+import { JourneyEntity } from '../../classes/journey/journey.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ReportEntity } from '../../classes/report/report.entity';
 
 @Injectable()
 export class ReportService {
-  create(createReportDto: CreateReportDto) {
-    return 'This action adds a new report';
-  }
+  constructor(
+    @InjectRepository(JourneyEntity)
+    private journeyRepository: Repository<JourneyEntity>,
+    @InjectRepository(ReportEntity)
+    private reportRepository: Repository<ReportEntity>,
+  ) {}
 
-  findAll() {
-    return `This action returns all report`;
-  }
+  async report(uuid: string, url: string, source: string) {
+    try {
+      const journey: JourneyEntity = await this.journeyRepository.findOneBy({
+        id: uuid,
+      });
 
-  findOne(id: number) {
-    return `This action returns a #${id} report`;
-  }
+      if (!journey) {
+        throw new Error('Journey not found');
+      }
 
-  update(id: number, updateReportDto: UpdateReportDto) {
-    return `This action updates a #${id} report`;
-  }
+      // Check if the update time exceeds 20 minutes
+      const now = new Date();
+      const lastUpdate = journey.updatedAt;
+      const diff = now.getTime() - lastUpdate.getTime();
+      const diffMinutes = Math.floor(diff / 1000 / 60);
+      if (diffMinutes > 20) {
+        // Create new journey
+        const newJourney = new JourneyEntity();
+        newJourney.registrations = 1;
+        await this.journeyRepository.save(newJourney);
+        return this.report(uuid, url, source);
+      }
 
-  remove(id: number) {
-    return `This action removes a #${id} report`;
+      // Update the journey
+      journey.registrations++;
+      await this.journeyRepository.save(journey);
+
+      const report = new ReportEntity();
+      report.journeyId = uuid;
+      report.url = url;
+      report.source = source;
+      await this.reportRepository.save(report);
+    } catch (e) {}
   }
 }
