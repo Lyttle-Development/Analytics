@@ -8,6 +8,9 @@ export class ReportEntity {
   @Column('uuid')
   journeyId: string;
 
-  @Column(() => String)
+  @Column('text', { nullable: true })
   url: string;
+
+  @Column('text', { nullable: true })
+  source: string;
 }

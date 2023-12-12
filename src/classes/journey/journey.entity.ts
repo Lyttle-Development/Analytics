@@ -17,6 +17,6 @@ export class JourneyEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column(() => Number)
+  @Column('int', { default: 0 })
   registrations: number;
 }
