@@ -23,9 +23,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         // 2. https://docs.nestjs.com/techniques/database#:~:text=WARNING,lose%20production%20data.
         // - Setting "synchronize: true" shouldn't be used in production - otherwise you can lose production data.
         synchronize: true,
+        entities: ['dist/**/*.entity{.ts,.js}'],
       }),
     }),
-    ReportModule, RegisterModule],
+    ReportModule,
+    RegisterModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
