@@ -48,10 +48,10 @@ export class RegisterService {
     const diffMinutes = Math.floor(diff / 1000 / 60);
     if (diffMinutes > 20) {
       // Create new journey
-      const newJourney = new JourneyEntity();
+      let newJourney = new JourneyEntity();
       newJourney.registrations = 0;
-      await this.journeyRepository.save(newJourney);
-      return this.login(journeyId);
+      newJourney = await this.journeyRepository.save(newJourney);
+      return this.login(newJourney.id);
     }
 
     journey.registrations++;

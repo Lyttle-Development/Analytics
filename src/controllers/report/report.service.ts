@@ -44,6 +44,7 @@ export class ReportService {
       report.journeyId = uuid;
       report.url = url;
       report.source = source;
+      report.journeyRegistration = journey.registrations;
       await this.reportRepository.save(report);
     } catch (e) {}
   }

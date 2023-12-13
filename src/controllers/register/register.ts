@@ -9,8 +9,14 @@
     getLink(href: string) {
       const url = encodeURIComponent(href);
       const uuid = CONFIG.JOURNEY_ID;
-      const source = window.location.href;
+      const source = encodeURIComponent(window.location.href);
       return `${CONFIG.ANALYTICS_URL}/report?url=${url}&uuid=${uuid}&source=${source}`;
+    },
+    setJourneyId(journeyId: string) {
+      if (journeyId && journeyId.length < 5) return false;
+      CONFIG.JOURNEY_ID = journeyId;
+      localStorage.setItem('journeyId', journeyId);
+      return true;
     },
   };
 
@@ -21,12 +27,6 @@
       this.registerLinks();
     },
     async registerJourney() {
-      const setJourneyId = (journeyId: string) => {
-        if (journeyId && journeyId.length < 5) return false;
-        CONFIG.JOURNEY_ID = journeyId;
-        localStorage.setItem('journeyId', journeyId);
-        return true;
-      };
       let journeyId = localStorage.getItem('journeyId');
       const newJourneyId1Res = await fetch(
         `${CONFIG.ANALYTICS_URL}/register?journeyId=${journeyId}`,
@@ -40,7 +40,7 @@
       const newJourneyId1 = await newJourneyId1Res.text();
       if (newJourneyId1 && typeof newJourneyId1 === 'string') {
         journeyId = newJourneyId1;
-        const res1 = setJourneyId(journeyId);
+        const res1 = utils.setJourneyId(journeyId);
         if (res1) return;
       }
 
@@ -54,7 +54,7 @@
       if (newJourneyId2 && typeof newJourneyId2 === 'string') {
         journeyId = newJourneyId2;
       }
-      setJourneyId(journeyId);
+      utils.setJourneyId(journeyId);
     },
     cacheElements() {
       this.$links = document.querySelectorAll('a');
@@ -62,7 +62,8 @@
     registerLinks() {
       this.$links.forEach(($link) => {
         const currentHref = $link.href;
-        $link.href = utils.getLink(currentHref);
+        const analyticsHref = utils.getLink(currentHref);
+        $link.href = analyticsHref;
       });
     },
   };

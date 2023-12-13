@@ -12,7 +12,7 @@ export class JourneyEntity {
   id: string;
 
   @CreateDateColumn()
-  startedAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;

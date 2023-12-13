@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('report')
 export class ReportEntity {
@@ -13,4 +18,10 @@ export class ReportEntity {
 
   @Column('text', { nullable: true })
   source: string;
+
+  @Column('int', { default: 0 })
+  journeyRegistration: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
